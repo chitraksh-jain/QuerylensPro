@@ -1,0 +1,310 @@
+/* --- GLOBAL RESET & FONTS --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: #1e1e1e; /* VS Code Dark Background */
+  color: #d4d4d4;
+  height: 100vh;
+  overflow: hidden; /* Prevent full page scroll */
+}
+
+/* --- MAIN LAYOUT --- */
+.ide-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* --- HEADER BAR --- */
+.header {
+  height: 60px;
+  background-color: #252526;
+  border-bottom: 1px solid #333;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+.header h1 span {
+  background: linear-gradient(135deg, #007bff, #00d4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  font-style: italic;
+  font-size: 1.1rem;
+  margin-left: 5px;
+}
+
+/* --- DB BADGE --- */
+.db-badge {
+  background: #1e1e1e;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- THE RUN BUTTON (HERO) --- */
+.run-btn {
+  background: linear-gradient(135deg, #28a745, #218838);
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.run-btn:hover:not(:disabled) {
+  transform: translateY(-2px); /* Slight lift effect */
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4); /* Green glow */
+}
+
+.run-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.run-btn:disabled {
+  background: #444;
+  color: #888;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- WORKSPACE (Sidebar + Editor + Results) --- */
+.workspace {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+/* --- SIDEBAR (History) --- */
+.history-pane {
+  width: 220px;
+  background-color: #252526;
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+}
+
+.pane-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #888;
+  padding: 10px 15px;
+  background-color: #2d2d2d;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #333;
+}
+
+.history-item {
+  padding: 10px 15px;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.history-item:hover {
+  background-color: #37373d;
+  border-left: 3px solid #007bff;
+}
+
+/* --- EDITOR PANE --- */
+.editor-pane {
+  flex: 1; /* Takes remaining space */
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #333;
+}
+
+/* --- RESULTS PANE --- */
+.results-pane {
+  flex: 1; /* Split screen 50/50 with editor usually */
+  background-color: #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  min-width: 400px; /* Prevent it getting too small */
+}
+
+/* --- TABS NAVIGATION --- */
+.tabs {
+  display: flex;
+  background-color: #252526;
+  border-bottom: 1px solid #333;
+  padding: 0 10px;
+  height: 40px;
+  align-items: center;
+  gap: 5px;
+}
+
+.tabs button {
+  background: transparent;
+  border: none;
+  color: #888;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.tabs button:hover {
+  color: #ccc;
+  background-color: #2d2d2d;
+}
+
+.tabs button.active {
+  color: white;
+  background-color: #1e1e1e; /* Matches body */
+  border-top: 2px solid #007bff; /* Blue accent top border */
+}
+
+/* CSV Button Special Styling */
+.tabs button.csv-btn {
+  margin-left: auto;
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid #28a745;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+}
+
+.tabs button.csv-btn:hover {
+  background: #28a745;
+  color: white;
+}
+
+/* --- TAB CONTENT AREA --- */
+.tab-content {
+  flex: 1;
+  overflow: hidden; /* Handle scrolling inside components */
+  position: relative;
+  background-color: #1e1e1e;
+}
+
+/* --- ERROR BANNER --- */
+.error-banner {
+  background-color: rgba(255, 77, 77, 0.1);
+  border-left: 4px solid #ff4d4d;
+  color: #ff9999;
+  padding: 15px;
+  margin: 10px;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- DATA TABLE --- */
+.table-wrapper {
+  height: 100%;
+  overflow: auto;
+  padding: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+th {
+  background-color: #2d2d2d;
+  color: #ccc;
+  font-weight: 600;
+  text-align: left;
+  padding: 10px;
+  position: sticky; /* Sticky Header! */
+  top: 0;
+  border-bottom: 2px solid #333;
+  z-index: 1;
+}
+
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #333;
+  color: #d4d4d4;
+}
+
+tr:hover td {
+  background-color: #2a2d2e; /* Row Highlight */
+  color: #fff;
+}
+
+tr:nth-child(even) {
+  background-color: #252526; /* Zebra Striping */
+}
+
+/* --- EMPTY STATES --- */
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-style: italic;
+  font-size: 1rem;
+}
+
+/* --- CHART & FLOWCHART WRAPPERS --- */
+.chart-wrapper, .flow-wrapper {
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  background: #1e1e1e;
+}
+
+/* --- CUSTOM SCROLLBAR (The "Pro" Touch) --- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 5px;
+  border: 2px solid #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4f4f4f;
+}

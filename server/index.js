@@ -1,0 +1,173 @@
+// server/index.js (FINAL PRO VERSION)
+const express = require('express');
+const mysql = require('mysql2');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const { spawn } = require('child_process'); 
+const path = require('path');
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+// --- DATABASE CONNECTION (Server Level) ---
+require('dotenv').config(); // Add this at the very top of the file
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: process.env.DB_USER,      // Reads from .env
+    password: process.env.DB_PASSWORD, // Reads from .env
+    database: process.env.DB_NAME,
+    multipleStatements: true
+});
+
+db.connect(err => {
+    if (err) console.error('❌ Error connecting to MySQL:', err.message);
+    else console.log('✅ Connected to MySQL Server! (Root Access)');
+});
+
+// --- ROUTE: GET CURRENT DB NAME ---
+app.get('/current-db', (req, res) => {
+    db.query('SELECT DATABASE() as db', (err, results) => {
+        if (err) return res.json({ db: 'Error' });
+        res.json({ db: results[0].db || 'None' });
+    });
+});
+
+// --- ROUTE: GET SCHEMA (TABLES & COLUMNS) ---
+app.post('/schema', (req, res) => {
+    db.query('SHOW TABLES', (err, tables) => {
+        if (err) return res.status(400).json({ error: "No Database Selected or Error fetching tables" });
+        if (tables.length === 0) return res.json({ schema: [] });
+
+        const tableKey = Object.keys(tables[0])[0]; 
+        const tableNames = tables.map(t => t[tableKey]);
+
+        // Get columns for all tables
+        const promises = tableNames.map(tableName => {
+            return new Promise((resolve) => {
+                db.query(`DESCRIBE ${tableName}`, (err, cols) => {
+                    resolve({ name: tableName, columns: cols || [] });
+                });
+            });
+        });
+
+        Promise.all(promises).then(fullSchema => {
+            res.json({ schema: fullSchema });
+        });
+    });
+});
+
+// --- ROUTE: EXECUTE QUERY ---
+// --- ROUTE: EXECUTE QUERY ---
+app.post('/execute', (req, res) => {
+    const userQuery = req.body.query;
+    console.log("🔹 Executing:", userQuery.substring(0, 50) + "...");
+    
+    db.query(userQuery, (err, results) => {
+        if (err) return res.status(400).json({ error: err.message });
+
+        let finalResult = results;
+        let isSelect = false;
+
+        // --- IMPROVED LOGIC FOR HANDLING RESULTS ---
+        
+        // 1. Check if it's a Multiple Statement Result (Array of Arrays/Objects)
+        // If 'results' is an array, and the first item is ALSO an array (rows) 
+        // OR the first item looks like a packet result (has fieldCount), it's a multi-statement.
+        if (Array.isArray(results)) {
+            // Case A: It's a simple SELECT (Array of RowDataPackets)
+            // We check if the first item looks like a Row (doesn't have affectedRows usually)
+            // But an INSERT result DOES have affectedRows.
+            
+            const firstItem = results[0];
+            const isMultiStatement = Array.isArray(firstItem) || (firstItem && 'affectedRows' in firstItem && results.length > 1);
+
+            if (isMultiStatement) {
+                // If multiple queries ran, we usually want to show the LAST one.
+                // Unless the last one is just an empty summary, then we search for the last SELECT.
+                
+                // Try to find the last actual SELECT result in the batch
+                const lastSelect = results.reverse().find(r => Array.isArray(r));
+                if (lastSelect) {
+                    finalResult = lastSelect;
+                    isSelect = true;
+                } else {
+                    // No SELECTs found? Then just take the last status packet
+                    finalResult = results[0]; // (Result was reversed above, so [0] is the last one)
+                    isSelect = false;
+                }
+            } else {
+                // Case B: Single Query Result
+                // Check if it is a SELECT (Array of Rows) or INSERT (Object with affectedRows)
+                if (firstItem && 'affectedRows' in firstItem && !Array.isArray(firstItem)) {
+                    // It's an INSERT/UPDATE/CREATE success packet
+                    isSelect = false;
+                } else {
+                    // It's a SELECT returning rows
+                    isSelect = true;
+                }
+            }
+        }
+
+        // Safety Truncate for large data
+        let displayResults = finalResult;
+        if (Array.isArray(finalResult) && finalResult.length > 1000) {
+            displayResults = finalResult.slice(0, 1000); 
+        }
+
+        res.json({
+            results: displayResults,
+            isSelect: isSelect
+        });
+    });
+});
+
+// --- ROUTE: ANALYZE QUERY (JAVA) ---
+app.post('/analyze', (req, res) => {
+    const userQuery = req.body.query.trim();
+    
+    // Guard: Only analyze SELECT queries
+    if (!userQuery.toUpperCase().startsWith('SELECT')) {
+        return res.json({ 
+            analysis: { 
+                score: 'N/A', risk: 'LOW', 
+                suggestion: 'Admin Command Executed. (Performance analysis skipped).' 
+            } 
+        });
+    }
+
+    const explainQuery = `EXPLAIN FORMAT=JSON ${userQuery}`;
+
+    db.query(explainQuery, (err, results) => {
+        if (err) return res.status(400).json({ error: err.message });
+
+        const rawExplainJSON = JSON.stringify(results[0].EXPLAIN);
+        const analyzerPath = path.join(__dirname, '../analyzer'); 
+        
+        // FIX: Use 'cwd' to handle folder spaces safely
+        const javaProcess = spawn('java', ['QueryAnalyzer'], { cwd: analyzerPath });
+
+        let javaOutput = '';
+
+        javaProcess.stdin.write(rawExplainJSON);
+        javaProcess.stdin.end();
+
+        javaProcess.stdout.on('data', (data) => javaOutput += data.toString());
+        javaProcess.stderr.on('data', (data) => console.error(`Java Error: ${data}`));
+
+        javaProcess.on('close', (code) => {
+            try {
+                const analysis = JSON.parse(javaOutput);
+                res.json({ analysis: analysis });
+            } catch (e) {
+                console.error("Parse Error:", javaOutput);
+                res.status(500).json({ error: "Java analysis failed" });
+            }
+        });
+    });
+});
+
+app.listen(3001, () => {
+    console.log('🚀 Server running on port 3001');
+});
