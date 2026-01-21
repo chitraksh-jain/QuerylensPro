@@ -11,12 +11,12 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // --- DATABASE CONNECTION (Server Level) ---
-require('dotenv').config(); // Add this at the very top of the file
+require('dotenv').config(); 
 
 const db = mysql.createConnection({
     host: 'localhost',
-    user: process.env.DB_USER,      // Reads from .env
-    password: process.env.DB_PASSWORD, // Reads from .env
+    user: process.env.DB_USER,      
+    password: process.env.DB_PASSWORD, 
     database: process.env.DB_NAME,
     multipleStatements: true
 });
@@ -70,41 +70,30 @@ app.post('/execute', (req, res) => {
         let finalResult = results;
         let isSelect = false;
 
-        // --- IMPROVED LOGIC FOR HANDLING RESULTS ---
-        
-        // 1. Check if it's a Multiple Statement Result (Array of Arrays/Objects)
-        // If 'results' is an array, and the first item is ALSO an array (rows) 
-        // OR the first item looks like a packet result (has fieldCount), it's a multi-statement.
         if (Array.isArray(results)) {
-            // Case A: It's a simple SELECT (Array of RowDataPackets)
-            // We check if the first item looks like a Row (doesn't have affectedRows usually)
-            // But an INSERT result DOES have affectedRows.
+           
             
             const firstItem = results[0];
             const isMultiStatement = Array.isArray(firstItem) || (firstItem && 'affectedRows' in firstItem && results.length > 1);
 
             if (isMultiStatement) {
-                // If multiple queries ran, we usually want to show the LAST one.
-                // Unless the last one is just an empty summary, then we search for the last SELECT.
-                
-                // Try to find the last actual SELECT result in the batch
+               
                 const lastSelect = results.reverse().find(r => Array.isArray(r));
                 if (lastSelect) {
                     finalResult = lastSelect;
                     isSelect = true;
                 } else {
-                    // No SELECTs found? Then just take the last status packet
-                    finalResult = results[0]; // (Result was reversed above, so [0] is the last one)
+                    
+                    finalResult = results[0]; 
                     isSelect = false;
                 }
             } else {
-                // Case B: Single Query Result
-                // Check if it is a SELECT (Array of Rows) or INSERT (Object with affectedRows)
+                
                 if (firstItem && 'affectedRows' in firstItem && !Array.isArray(firstItem)) {
-                    // It's an INSERT/UPDATE/CREATE success packet
+                   
                     isSelect = false;
                 } else {
-                    // It's a SELECT returning rows
+                    
                     isSelect = true;
                 }
             }
@@ -145,7 +134,7 @@ app.post('/analyze', (req, res) => {
         const rawExplainJSON = JSON.stringify(results[0].EXPLAIN);
         const analyzerPath = path.join(__dirname, '../analyzer'); 
         
-        // FIX: Use 'cwd' to handle folder spaces safely
+        
         const javaProcess = spawn('java', ['QueryAnalyzer'], { cwd: analyzerPath });
 
         let javaOutput = '';

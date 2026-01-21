@@ -8,7 +8,7 @@ import axios from 'axios';
 import 'reactflow/dist/style.css';
 import './App.css';
 
-// We removed the import for SqlEditor because we are using the Pro Monaco Editor instead.
+
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -36,7 +36,7 @@ function App() {
 
  
 
-  // Reset zoom when switching tabs (Optional, but good UX)
+
   useEffect(() => {
     setZoom(1.0);
   }, [activeTab]);
@@ -56,7 +56,7 @@ function App() {
     } catch (e) { setCurrentDb('Offline'); }
   };
 
-  // --- AI HELPER ---
+ 
   const getAISuggestion = (sqlError) => {
     if (!sqlError) return null;
     if (sqlError.includes("syntax")) return "💡 AI Tip: Check for missing semicolons or keywords.";
@@ -65,8 +65,7 @@ function App() {
     return "💡 AI Tip: Try running a simpler query to isolate the issue.";
   };
 
-  // --- NEW: HANDLE EDITOR MOUNT ---
-  // This allows us to access the editor instance to find selected text
+ 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
   };
@@ -240,7 +239,7 @@ function App() {
             theme="vs-dark" 
             value={query} 
             onChange={setQuery} 
-            onMount={handleEditorDidMount} // <--- CRITICAL: Connects editor to our code
+            onMount={handleEditorDidMount} 
             options={{minimap:{enabled:false}, fontSize:14}} 
           />
         </div>
@@ -271,7 +270,7 @@ function App() {
             {activeTab === 'table' && (
               <div className="table-wrapper">
                 {tableData.length > 0 ? (
-                  /* --- CHANGE IS HERE: We added style for zoom --- */
+                 
                   <table style={{ fontSize: `${zoom}rem` }}>
                     <thead>
                       <tr>
@@ -283,7 +282,7 @@ function App() {
                         <tr key={i}>
                           {Object.values(r).map((v, j) => (
                             <td key={j}>
-                              {/* Keep your safety fix here! */}
+                              {}
                               {typeof v === 'object' && v !== null ? JSON.stringify(v) : v}
                             </td>
                           ))}
