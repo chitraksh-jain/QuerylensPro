@@ -13,8 +13,7 @@ import './App.css';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function App() {
-  const [query, setQuery] = useState('USE querylens_test;\nSELECT * FROM large_orders LIMIT 10;');
-  const [activeTab, setActiveTab] = useState('table'); 
+  const [query, setQuery] = useState('SELECT 1;');  const [activeTab, setActiveTab] = useState('table'); 
   const [currentDb, setCurrentDb] = useState('Checking...');
   
   // Data States
