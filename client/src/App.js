@@ -51,7 +51,7 @@ function App() {
 
   const checkDb = async () => {
     try {
-        const res = await axios.get('http://localhost:3001/current-db');
+        const res = await axios.get('https://querylenspro.onrender.com/current-db');
         setCurrentDb(res.data.db);
     } catch (e) { setCurrentDb('Offline'); }
   };
@@ -96,7 +96,7 @@ function App() {
 
     try {
       // 2. Execute
-      const execRes = await axios.post('http://localhost:3001/execute', { query: queryToExecute });
+      const execRes = await axios.post('https://querylenspro.onrender.com/execute', { query: queryToExecute });
       
       if (execRes.data.isSelect) {
         setTableData(execRes.data.results);
@@ -114,7 +114,7 @@ function App() {
       }
       
       // 3. Analyze (Only if SELECT)
-      const analyzeRes = await axios.post('http://localhost:3001/analyze', { query: queryToExecute });
+      const analyzeRes = await axios.post('https://querylenspro.onrender.com/analyze', { query: queryToExecute });
       generateFlowchart(analyzeRes.data.analysis);
 
     } catch (err) {
@@ -143,7 +143,7 @@ function App() {
 
   const loadSchema = async () => {
     try {
-        const res = await axios.post('http://localhost:3001/schema');
+        const res = await axios.post('https://querylenspro.onrender.com/schema');
         const nodes = res.data.schema.map((table, i) => ({
             id: `tbl-${table.name}`,
             position: { x: i * 250, y: 0 },
