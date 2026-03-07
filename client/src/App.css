@@ -1,310 +1,649 @@
-/* --- GLOBAL RESET & FONTS --- */
-* {
+/* ============================================================
+   QueryLens PRO — App.css  (Fixed & Final)
+   ============================================================
+   NO Google Fonts import (use system fonts — no network dep)
+   NO CSS variables that App.js never uses
+   NO .light class (App.js uses inline styles for theme)
+   NO `inset` shorthand (use explicit top/right/bottom/left)
+   -webkit-text-fill-color is used intentionally for gradient text on .header h1 span
+   ALL prefixes included where needed
+   ============================================================ */
+
+/* ── GLOBAL RESET ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
-  background-color: #1e1e1e; /* VS Code Dark Background */
-  color: #d4d4d4;
-  height: 100vh;
-  overflow: hidden; /* Prevent full page scroll */
+  font-family:
+    "Segoe UI",
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  background-color: #1a1a1a;
+  color: #e8e8e8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
 }
 
-/* --- MAIN LAYOUT --- */
+/* ── LAYOUT ───────────────────────────────────────────────── */
 .ide-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  overflow: hidden;
 }
 
-/* --- HEADER BAR --- */
+/* ── HEADER ───────────────────────────────────────────────── */
 .header {
-  height: 60px;
+  min-height: 58px;
   background-color: #252526;
   border-bottom: 1px solid #333;
   display: flex;
   align-items: center;
   padding: 0 20px;
+  gap: 14px;
   justify-content: space-between;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .header h1 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
   color: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
+/* PRO gradient text — using background on text trick
+   -webkit-text-fill-color is used for gradient text rendering. */
 .header h1 span {
-  background: linear-gradient(135deg, #007bff, #00d4ff);
+  background: linear-gradient(135deg, #007bff, #00c6ff);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: transparent; /* makes background gradient show through */
   font-weight: 800;
   font-style: italic;
-  font-size: 1.1rem;
-  margin-left: 5px;
+  font-size: 1.05rem;
+  margin-left: 4px;
 }
 
-/* --- DB BADGE --- */
+/* ── DB BADGE ─────────────────────────────────────────────── */
 .db-badge {
   background: #1e1e1e;
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1px solid #333;
-  font-size: 0.85rem;
+  padding: 5px 14px;
+  border-radius: 100px;
+  border: 1px solid #404040;
+  font-size: 0.82rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  white-space: nowrap;
+  transition: border-color 0.15s ease;
 }
 
-/* --- THE RUN BUTTON (HERO) --- */
+.db-badge:hover {
+  border-color: #007bff;
+}
+
+/* ── RUN BUTTON ───────────────────────────────────────────── */
 .run-btn {
-  background: linear-gradient(135deg, #28a745, #218838);
-  color: white;
-  border: none;
-  padding: 8px 24px;
-  font-size: 0.9rem;
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+  color: #fff;
+  padding: 8px 20px;
+  font-size: 0.88rem;
   font-weight: 600;
-  border-radius: 4px;
+  border-radius: 6px;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.12s ease;
+  font-family: inherit;
 }
 
 .run-btn:hover:not(:disabled) {
-  transform: translateY(-2px); /* Slight lift effect */
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4); /* Green glow */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(40, 167, 69, 0.4);
 }
 
 .run-btn:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: none;
 }
 
 .run-btn:disabled {
-  background: #444;
-  color: #888;
+  background: #3a3a3a;
+  color: #666;
   cursor: not-allowed;
+  box-shadow: none;
   transform: none;
 }
 
-/* --- WORKSPACE (Sidebar + Editor + Results) --- */
+/* ── WORKSPACE ────────────────────────────────────────────── */
 .workspace {
   display: flex;
   flex: 1;
-  height: calc(100vh - 60px);
   overflow: hidden;
+  min-height: 0; /* critical for flex children to scroll */
 }
 
-/* --- SIDEBAR (History) --- */
+/* ── HISTORY PANE ─────────────────────────────────────────── */
 .history-pane {
   width: 220px;
+  min-width: 220px;
   background-color: #252526;
   border-right: 1px solid #333;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  transition: background 0.25s ease;
+  flex-shrink: 0;
 }
 
 .pane-title {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   font-weight: 700;
-  color: #888;
-  padding: 10px 15px;
-  background-color: #2d2d2d;
-  letter-spacing: 0.5px;
+  color: #666;
+  padding: 8px 12px;
+  letter-spacing: 0.07em;
   border-bottom: 1px solid #333;
+  background: #2a2a2a;
+  flex-shrink: 0;
 }
 
 .history-item {
-  padding: 10px 15px;
-  border-bottom: 1px solid #333;
+  padding: 9px 14px;
+  border-bottom: 1px solid #2e2e2e;
   cursor: pointer;
-  transition: background 0.2s;
+  border-left: 3px solid transparent;
+  transition:
+    background 0.12s ease,
+    border-left-color 0.12s ease;
 }
 
 .history-item:hover {
-  background-color: #37373d;
-  border-left: 3px solid #007bff;
+  background-color: #2e2e2e;
+  border-left-color: #007bff;
 }
 
-/* --- EDITOR PANE --- */
+/* ── EDITOR PANE ──────────────────────────────────────────── */
 .editor-pane {
-  flex: 1; /* Takes remaining space */
   display: flex;
   flex-direction: column;
   border-right: 1px solid #333;
+  overflow: hidden;
+  min-width: 200px;
+  min-height: 0;
+  transition: background 0.25s ease;
 }
 
-/* --- RESULTS PANE --- */
+/* ── RESULTS PANE ─────────────────────────────────────────── */
 .results-pane {
-  flex: 1; /* Split screen 50/50 with editor usually */
-  background-color: #1e1e1e;
   display: flex;
   flex-direction: column;
-  min-width: 400px; /* Prevent it getting too small */
+  overflow: hidden;
+  min-width: 200px;
+  min-height: 0;
+  transition: background 0.25s ease;
 }
 
-/* --- TABS NAVIGATION --- */
+/* ── TABS ─────────────────────────────────────────────────── */
 .tabs {
   display: flex;
   background-color: #252526;
   border-bottom: 1px solid #333;
-  padding: 0 10px;
-  height: 40px;
+  padding: 0 8px;
+  min-height: 40px;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  transition: background 0.25s ease;
+}
+
+/* Hide horizontal scrollbar on tabs row */
+.tabs::-webkit-scrollbar {
+  height: 0;
+  width: 0;
 }
 
 .tabs button {
   background: transparent;
   border: none;
   color: #888;
-  padding: 8px 16px;
-  font-size: 0.85rem;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 500;
   cursor: pointer;
   border-radius: 4px 4px 0 0;
-  transition: all 0.2s;
-  position: relative;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
+  white-space: nowrap;
+  font-family: inherit;
 }
 
 .tabs button:hover {
   color: #ccc;
-  background-color: #2d2d2d;
+  background-color: #2e2e2e;
 }
 
 .tabs button.active {
-  color: white;
-  background-color: #1e1e1e; /* Matches body */
-  border-top: 2px solid #007bff; /* Blue accent top border */
+  color: #fff;
+  background-color: #1e1e1e;
+  border-top: 2px solid #007bff;
+  font-weight: 600;
 }
 
-/* CSV Button Special Styling */
+/* CSV button */
 .tabs button.csv-btn {
-  margin-left: auto;
-  background: rgba(40, 167, 69, 0.1);
+  background: rgba(40, 167, 69, 0.08);
   color: #28a745;
-  border: 1px solid #28a745;
-  border-radius: 4px;
+  border: 1px solid rgba(40, 167, 69, 0.4);
+  border-radius: 5px;
   padding: 4px 12px;
   font-size: 0.75rem;
+  font-weight: 600;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
 .tabs button.csv-btn:hover {
   background: #28a745;
-  color: white;
+  color: #fff;
+  border-color: #28a745;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
 }
 
-/* --- TAB CONTENT AREA --- */
+/* ── TAB CONTENT ──────────────────────────────────────────── */
 .tab-content {
   flex: 1;
-  overflow: hidden; /* Handle scrolling inside components */
+  overflow: hidden;
   position: relative;
-  background-color: #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-/* --- ERROR BANNER --- */
+/* ── ERROR BANNER ─────────────────────────────────────────── */
 .error-banner {
-  background-color: rgba(255, 77, 77, 0.1);
+  background: rgba(255, 77, 77, 0.08);
   border-left: 4px solid #ff4d4d;
   color: #ff9999;
-  padding: 15px;
+  padding: 14px 16px;
   margin: 10px;
-  font-size: 0.9rem;
-  border-radius: 4px;
+  font-size: 0.88rem;
+  border-radius: 0 6px 6px 0;
   white-space: pre-wrap;
-  animation: slideIn 0.3s ease-out;
+  animation: slideDown 0.25s ease;
+  line-height: 1.6;
+  flex-shrink: 0;
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- DATA TABLE --- */
+/* ── TABLE ────────────────────────────────────────────────── */
 .table-wrapper {
-  height: 100%;
+  flex: 1;
   overflow: auto;
-  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  font-family:
+    "Cascadia Code", "Fira Code", "JetBrains Mono", "Courier New", monospace;
   white-space: nowrap;
+  min-width: 100%;
 }
 
 th {
-  background-color: #2d2d2d;
-  color: #ccc;
+  background-color: #2a2a2a;
+  color: #aaa;
   font-weight: 600;
+  font-size: 0.76rem;
   text-align: left;
-  padding: 10px;
-  position: sticky; /* Sticky Header! */
+  padding: 9px 14px;
+  position: sticky;
   top: 0;
-  border-bottom: 2px solid #333;
-  z-index: 1;
+  border-bottom: 2px solid #404040;
+  z-index: 2;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari, Chrome, older Edge */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ / Edge Legacy */
+  user-select: none; /* Standard — Chrome 54+, Firefox 69+, Edge 79+ */
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+th:hover {
+  background-color: #333;
+  color: #e8e8e8;
 }
 
 td {
-  padding: 8px 10px;
-  border-bottom: 1px solid #333;
+  padding: 7px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   color: #d4d4d4;
+  font-size: 0.855rem;
+  transition: background 0.1s ease;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Zebra rows */
+tr:nth-child(even) td {
+  background-color: rgba(255, 255, 255, 0.016);
 }
 
 tr:hover td {
-  background-color: #2a2d2e; /* Row Highlight */
+  background-color: rgba(0, 123, 255, 0.07) !important;
   color: #fff;
 }
 
-tr:nth-child(even) {
-  background-color: #252526; /* Zebra Striping */
-}
-
-/* --- EMPTY STATES --- */
+/* ── EMPTY STATE ──────────────────────────────────────────── */
 .empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1;
   height: 100%;
-  color: #666;
-  font-style: italic;
-  font-size: 1rem;
+  min-height: 180px;
 }
 
-/* --- CHART & FLOWCHART WRAPPERS --- */
-.chart-wrapper, .flow-wrapper {
+/* ── CHART & FLOW WRAPPERS ────────────────────────────────── */
+.chart-wrapper {
   height: 100%;
   width: 100%;
-  padding: 20px;
-  background: #1e1e1e;
+  padding: 16px;
+  overflow: auto;
 }
 
-/* --- CUSTOM SCROLLBAR (The "Pro" Touch) --- */
+.flow-wrapper {
+  height: 100%;
+  width: 100%;
+}
+
+/* ReactFlow overrides */
+.react-flow__node {
+  border-radius: 6px !important;
+  font-family: "Segoe UI", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  transition: box-shadow 0.15s ease !important;
+}
+
+.react-flow__node:hover {
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5) !important;
+}
+
+.react-flow__edge-path {
+  stroke: #007bff !important;
+  stroke-opacity: 0.65;
+}
+
+.react-flow__controls {
+  border: 1px solid #404040 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+.react-flow__controls-button {
+  background: #2a2a2a !important;
+  border: none !important;
+  border-bottom: 1px solid #404040 !important;
+  fill: #aaa !important;
+  transition: background 0.12s ease !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #333 !important;
+  fill: #fff !important;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #424242;
-  border-radius: 5px;
-  border: 2px solid #1e1e1e;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 100px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4f4f4f;
+  background-color: rgba(255, 255, 255, 0.22);
+  background-clip: content-box;
+}
+
+/* ── CONNECT MODAL (used inline in App.js) ────────────────── */
+/* Only the overlay animation is needed — modal itself uses inline styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0; /* replaces `inset: 0` which VS Code flags */
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+  -webkit-backdrop-filter: blur(4px); /* Safari */
+  backdrop-filter: blur(4px);
+}
+
+/* ── TOASTS (used via ToastContainer component) ───────────── */
+.toast-success {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+}
+.toast-error {
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
+}
+.toast-warning {
+  background: linear-gradient(135deg, #d35400, #e67e22);
+}
+
+/* ── ANIMATIONS ───────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Pulse for DB "Checking..." state */
+.db-checking {
+  animation: pulse 1.5s ease infinite;
+}
+
+/* ── EDITOR LAZY LOADING FALLBACK ─────────────────────────── */
+.editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #555;
+  font-size: 0.9rem;
+  gap: 8px;
+  animation: pulse 1.5s ease infinite;
+}
+
+/* ── SELECTION HIGHLIGHT ──────────────────────────────────── */
+::selection {
+  background: rgba(0, 123, 255, 0.28);
+  color: inherit;
+}
+
+/* ── RESPONSIVE / MOBILE (#37) ────────────────────────────── */
+@media (max-width: 900px) {
+  .workspace {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .history-pane {
+    width: 100%;
+    min-width: unset;
+    max-height: 160px;
+    border-right: none;
+    border-bottom: 1px solid #333;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+
+  .editor-pane {
+    min-height: 220px;
+    border-right: none;
+    border-bottom: 1px solid #333;
+    flex-shrink: 0;
+  }
+
+  .results-pane {
+    min-width: unset;
+    min-height: 280px;
+    flex-shrink: 0;
+  }
+
+  .header {
+    padding: 8px 14px;
+    gap: 8px;
+  }
+
+  .header h1 {
+    font-size: 1.1rem;
+  }
+
+  .db-badge {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+  }
+
+  .run-btn {
+    padding: 7px 12px;
+    font-size: 0.82rem;
+  }
+
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    height: auto;
+    padding: 4px 8px;
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header h1 span {
+    display: none; /* hide "PRO" on very small screens */
+  }
 }
